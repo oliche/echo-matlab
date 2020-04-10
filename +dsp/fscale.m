@@ -2,6 +2,7 @@ function fscale = fscale(Ns,Si,option)
 % fscale = dsp.fscale(Ns,Si)
 % fscale = dsp.fscale(Ns,Si,'full')
 % fscale = dsp.fscale(Ns,Si,'real')
+% gnagnagnag
 
 if nargin <= 2 , option = 'full'; end
 
