@@ -4,42 +4,35 @@ classdef ffilter
     methods(Static)
         %% low pass filter - 2 frequency values
         function ts_ = lp(ts, si, b, varargin)
+            % dsp.ffilter.lp(X, 0.002, [20 30], 'padding', 0.5, 'taper', 0.2)
             ts_ = generic_filter(ts, si, b, 'lp', varargin{:});
         end
         
         %% high pass filter - 2 frequency values
         function ts_ = hp(ts, si, b, varargin)
+            % dsp.ffilter.hp(X, 0.002, [2 4], 'padding', 0.5, 'taper', 0.2)
             ts_ = generic_filter(ts, si, b, 'hp', varargin{:});
         end
         
         %% band pass filter - 4 frequency values
         function ts_ = bp(ts, si, b, varargin)
+            % dsp.ffilter.hp(X, 0.002, [2 4 80 100], 'padding', 0.5, 'taper', 0.2)
             ts_ = generic_filter(ts, si, b, 'bp', varargin{:});
         end
     end
 end
 
 
-function ts_ = generic_filter(ts, si,b, type,  varargin)
+function ts_ = generic_filter(ts_, si,b, type,  varargin)
 % Inputs
 p=inputParser;
 p.addParameter('padding', 0, @isnumeric);
 p.addParameter('taper', 0, @isnumeric);
 p.parse(varargin{:});
 for ff=fields(p.Results)', eval([ff{1} '=p.Results.' ff{1} ';' ]); end
-ts_ = ts;
-% apply mirror padding at the beginning + tapering
-if padding > 0
-    npad = round(padding / si);
-    size_orig = size(ts);
-    ts_ = [ts(npad:-1:2, :); ts(:,:); ts(end-1:-1:end-npad+1,:)];
-end
-% apply taper in / taper out
-if taper > 0 
-   ntap = round(taper / si);
-    ts_(1:npad, :) = bsxfun(@times, ts_(1:npad, :), dsp.window.cosine(npad)); % taper in
-    ts_(end-npad+1:end, :) = bsxfun(@times, ts_(end-npad+1:end, :), 1 - dsp.window.cosine(npad)); % taper in
-end
+size_orig = size(ts_);
+ts_ = dsp.padding_tapering(ts_, si, padding, taper, true);
+
 % compute the filter and apply in frequency domain
 [ns, ntr] = size(ts_);
 f = dsp.freduce(dsp.fscale(ns, si));
@@ -54,8 +47,6 @@ switch type
 end
 ts_ = real(ifft(bsxfun(@times, fft(ts_), dsp.fexpand(filc, ns))));
 % remove the padding if any
-if padding > 0
-    ts_ = ts_(npad:end-(npad-1), :);    
-end
+ts_ = dsp.padding_tapering(ts_, si, padding, taper, false);
 ts_ = reshape(ts_, size_orig);
 end

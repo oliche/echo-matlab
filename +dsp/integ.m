@@ -1,20 +1,26 @@
-function [Y,rep] = integ(X,si,par,phase)
+function [Y,rep] = integ(X, si, varargin)
 % Filtre Integrateur + LowCut
-% [Y,rep] = dsp.integ(X,si,par,phase)
+% [Y,rep] = dsp.integ(X,si,par, 'phase', phase)
 % X :      Input Array : filter will be done in dimension 1
 % si:      Sampling in seconds
 % par:     array of 2 parameters [a b ] a = freq of low cut, b=order order 1 6dB 2:12db 3:18db ... 
 % phase:   'lin' or 'min'. If no parameters min phase 
-% author: T. Bianchi         
 
-if ~exist('par','var');par=[1 0];end
-if ~exist('phase','var');phase='min';end
+% author: TB, OW  
 
-dF=1/(size(X,1)*si);
-F=dF*[0 1:((size(X,1))/2) -fliplr((1:size(X,1)/2-.25))].';
-w=2*pi*F;
+p=inputParser;
+p.addOptional('par', [1, 0]);
+p.addParameter('phase', 'min');
+p.addParameter('padding', 0, @isnumeric);
+p.addParameter('taper', 0, @isnumeric);
+p.parse(varargin{:});
+for ff=fields(p.Results)', eval([ff{1} '=p.Results.' ff{1} ';' ]); end
 
-rep=ones(size(X,1),1);
+Y = dsp.padding_tapering(X, si, padding, taper, true); % apply taper / padding before compute
+ns = size(Y, 1);
+w = 2 * pi .* dsp.fscale(ns, si);
+
+rep = ones(ns,1);
 Fc=par(1);
 wc=2*pi*Fc;
 ord=par(2);
@@ -31,9 +37,7 @@ if strcmp(phase,'lin')
     rep=abs(rep);
 end
 
-Y=fft(X);
-Y=bsxfun(@times,Y,rep);
-Y=real(ifft(Y));
-
-
-
+Y = fft(Y);
+Y = bsxfun(@times,Y,rep);
+Y = real(ifft(Y));
+Y = dsp.padding_tapering(Y, si, padding, taper, false); % removetaper / padding before compute
