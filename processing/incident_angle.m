@@ -13,15 +13,15 @@ function [iangle, vDix]= incident_angle(W, H, T, V, lsmooth)
 
 si = H(9) / 1e6;
 switch true
-    case isscalar(W), ntr = W;
-    otherwise, ntr = size(W, 1);
+    case isscalar(W), ns = W;
+    otherwise, ns = size(W, 1);
 end
 
 if nargin <= 4, lsmooth = 30; end
 if T(1) ~= 0, V = [V(1); V]; T = [0;T]; end
-if T(end) < (si * ntr), V = [V; V(end)]; T = [T; si * size(W, 1)]; end
+if T(end) < (si * ns), V = [V; V(end)]; T = [T; si * ns]; end
 
-tscale = [0:ntr - 1]' * si;
+tscale = [0:ns - 1]' * si;
 v = interp1(T,V,tscale);
 if lsmooth ~= 0
     smooth = hanning(lsmooth);

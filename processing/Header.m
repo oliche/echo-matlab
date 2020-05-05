@@ -53,11 +53,11 @@ classdef Header < double
     
     methods (Static)
         function header = create(ntr, varargin)
-            % Inputs
+            % Inputs 
             p=inputParser;
             fcn_validate = @(x) isscalar(x) || prod(size(x)) == prod(ntr);
             p.addParameter('si', 0.002, fcn_validate);
-            p.addParameter('offset', 0.002, fcn_validate);
+            p.addParameter('offset', 0, fcn_validate);
             p.parse(varargin{:}) ; field = fieldnames(p.Results) ;
             for r = 1 : length(field), eval([field{r} '= p.Results.(field{r}) ; ']) ; end
             H = zeros(64, ntr, 'single');
