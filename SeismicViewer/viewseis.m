@@ -27,14 +27,14 @@ set(figsv, 'name', name)
 
 %% get figure handles and start updating data
 h = guidata(figsv);
-[nech, ntr] = size(W(:, :));
+[ns, ntr] = size(W(:, :));
 si = H(9) / 1e6;
-set(h.im_seismic, 'CData', W(:,:), 'ydata', [0, nech*si], 'xdata', [1, ntr])
-set(h.axe_seismic, 'xlim', [1, ntr], 'ylim', [0, nech*si])
+set(h.im_seismic, 'CData', W(:,:), 'ydata', [0, ns*si], 'xdata', [1, ntr])
+set(h.axe_seismic, 'xlim', [1, ntr], 'ylim', [0, ns*si])
+set(h.axe_seismic, 'clim',median(dsp.rms(W)) * 4 .* [-1 1])
 
-
-
-set(h.fig_main, 
-
+%% set the data structure in the GUI
+setappdata(h.fig_main, 'D', struct('W', W, 'H', Header(H), 'ns', ns, 'ntr', ntr, 'si', si));
+h.var = struct('ybounds', [0 (ns - 1) .* si], 'xbounds', [1 ntr]);
+guidata(figsv, h)
 end
-
