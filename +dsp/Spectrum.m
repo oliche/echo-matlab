@@ -17,7 +17,7 @@ p.addParamValue('Logx',0,@(x) isnumeric(x) | islogical(x));
 p.addParamValue('Unwrap',  false ,@(x) isnumeric(x) | islogical(x));
 p.addParamValue('Display', true ,@(x) isnumeric(x) | islogical(x));
 p.addParamValue('Smoothed',0,@isnumeric);
-p.addParamValue('fig',[],@isnumeric);
+p.addParamValue('fig',[],@ishandle);
 p.addParamValue('plotArgs',{},@iscell);
 
 

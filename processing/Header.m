@@ -43,12 +43,12 @@ classdef Header < double
         end
         
         function obj = set(obj, attribute, value)
-           switch attribute
-               case 'offset', word = 20;
-           end
-            obj(word, :) = value;
+           keys = self.keywords;
+           ff = fields(keys);
+           ind = find(cellfun(@(x) strcmpi(x, attribute), ff));
+           if isempty(ind), return, end
+            obj(keys.(ff{ind}), :) = value;
         end
-        
     end
     
     methods (Static)
@@ -64,6 +64,24 @@ classdef Header < double
             H(20, :) = offset;
             H( 9, :) = si .* 1e6;            
             header = Header(H);
+        end
+        
+        
+        function key = keywords
+            key.shot_number =  2;
+            key.crossline =  4;
+            key.si_us =  9;
+            key.receiver_number = 18;
+            key.inline = 19;
+            key.offset = 20;
+            key.receiver_line = 36;
+            key.shot_line = 37;
+            key.cdp_x = 43;
+            key.cdp_y = 44;
+            key.shot_x = 60;
+            key.shot_y = 61;
+            key.receiver_x = 62;
+            key.receiver_y = 63;
         end
     end
 end
