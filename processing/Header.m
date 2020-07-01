@@ -53,7 +53,7 @@ classdef Header < double
     
     methods (Static)
         function header = create(ntr, varargin)
-            % Inputs 
+            % header = create(ntr, 'si', 0.002, 'offset', offset_vector) 
             p=inputParser;
             fcn_validate = @(x) isscalar(x) || prod(size(x)) == prod(ntr);
             p.addParameter('si', 0.002, fcn_validate);

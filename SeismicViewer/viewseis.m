@@ -26,8 +26,9 @@ setappdata(0, 'viewseis', registered_figures)
 set(figsv, 'name', name)
 
 %% get figure handles and start updating data
-h = guidata(figsv);
 [ns, ntr] = size(W(:, :));
+if isscalar(H), H = Header.create(size(W, 2), 'si', H); end
+h = guidata(figsv);
 si = H(9) / 1e6;
 
 %% set the data structure in the GUI
