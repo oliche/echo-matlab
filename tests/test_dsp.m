@@ -7,8 +7,10 @@ classdef test_dsp < matlab.unittest.TestCase
             % full window
             exp = [0;0.116977778440511;0.413175911166535;0.75;0.969846310392954;0.969846310392954;0.75;0.413175911166535;0.116977778440511;0];
             self.assertTrue(all(abs(dsp.window.cosine(10, false) - exp(:)) < 1e-10))
+            self.assertTrue(all(abs(dsp.window.hanning(10, false) - exp(:)) < 1e-10))
             exp = [0;0.146446609406726;0.5;0.853553390593274;1;0.853553390593274;0.5;0.146446609406726;0];
             assert(all(abs(dsp.window.cosine(9, false) - exp(:)) < 1e-10))
+            assert(all(abs(dsp.window.hanning(9, false) - exp(:)) < 1e-10))
             % half window
             exp = [0;0.0380602337443566;0.146446609406726;0.308658283817455;0.5;0.691341716182545;0.853553390593274;0.961939766255643;1];
             self.assertTrue(all(abs(dsp.window.cosine(9) - exp(:)) < 1e10))
