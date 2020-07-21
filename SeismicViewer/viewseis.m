@@ -27,7 +27,7 @@ set(figsv, 'name', name)
 
 %% get figure handles and start updating data
 [ns, ntr] = size(W(:, :));
-if isscalar(H), H = Header.create(size(W, 2), 'si', H); end
+if isscalar(H), H = Header.create(ntr, 'si', H); end
 h = guidata(figsv);
 si = H(9) / 1e6;
 
