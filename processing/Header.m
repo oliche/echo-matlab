@@ -4,33 +4,17 @@ classdef Header < double
     %
     % Provides array like and structure like array functionalities
     % H will behave like a double array and can be concatenated an sliced as such
-    % 
+    %
     % Getting data:
     % offset = H(20, 2:5);
-    % is equivalent to 
+    % is equivalent to
     % offset = H.offset(2:5);
     %
     % Setting data:
     % H(20, :) = offset;
-    % is equivalent to 
+    % is equivalent to
     % H = H.set('offset', offset);
     %
-    % List of keywords / indices combinations:
-    % H( 2, :) shot_number
-    % H( 4, :) crossline
-    % H( 9, :) si_us
-    % H(18, :) receiver_number
-    % H(19, :) inline
-    % H(20, :) offset
-    % H(36, :) receiver_line
-    % H(37, :) shot_line
-    % H(43, :) cdp_x
-    % H(44, :) cdp_y
-    % H(60, :) shot_x
-    % H(61, :) shot_y
-    % H(62, :) receiver_x
-    % H(63, :) receiver_y
-    % 
     
     methods
         function obj = Header(data)
@@ -39,21 +23,21 @@ classdef Header < double
         
         function off = offset(obj, varargin)
             if isempty(varargin), varargin = {':'}; end
-           off = obj(20, varargin{:}); 
+            off = obj(20, varargin{:});
         end
         
         function obj = set(obj, attribute, value)
-           keys = self.keywords;
-           ff = fields(keys);
-           ind = find(cellfun(@(x) strcmpi(x, attribute), ff));
-           if isempty(ind), return, end
-            obj(keys.(ff{ind}), :) = value;
+            keys = Header.keywords;
+            ff = fields(keys);
+            ind = find(cellfun(@(x) strcmpi(x, attribute), ff));
+            if isempty(ind), return, end
+            obj(keys.(ff{ind}).index, :) = value;
         end
     end
     
     methods (Static)
         function header = create(ntr, varargin)
-            % header = create(ntr, 'si', 0.002, 'offset', offset_vector) 
+            % header = create(ntr, 'si', 0.002, 'offset', offset_vector)
             p=inputParser;
             fcn_validate = @(x) isscalar(x) || prod(size(x)) == prod(ntr);
             p.addParameter('si', 0.002, fcn_validate);
@@ -62,26 +46,37 @@ classdef Header < double
             for r = 1 : length(field), eval([field{r} '= p.Results.(field{r}) ; ']) ; end
             H = zeros(64, ntr, 'single');
             H(20, :) = offset;
-            H( 9, :) = si .* 1e6;            
+            H( 9, :) = si .* 1e6;
             header = Header(H);
         end
         
-        
         function key = keywords
-            key.shot_number =  2;
-            key.crossline =  4;
-            key.si_us =  9;
-            key.receiver_number = 18;
-            key.inline = 19;
-            key.offset = 20;
-            key.receiver_line = 36;
-            key.shot_line = 37;
-            key.cdp_x = 43;
-            key.cdp_y = 44;
-            key.shot_x = 60;
-            key.shot_y = 61;
-            key.receiver_x = 62;
-            key.receiver_y = 63;
+            % default keywords
+            key.shot_number = struct('index', 2, 'help_string', '');
+            key.crossline = struct('index', 4, 'help_string', '');
+            key.si_us = struct('index', 9, 'help_string', '');
+            key.receiver_number = struct('index', 18, 'help_string', '');
+            key.inline = struct('index', 19, 'help_string', '');
+            key.offset = struct('index', 20, 'help_string', '');
+            key.sensor_type = struct('index', 28, 'help_string', '');
+            key.receiver_line = struct('index', 36, 'help_string', '');
+            key.shot_line = struct('index', 37, 'help_string', '');
+            key.cdp_x = struct('index', 43, 'help_string', '');
+            key.cdp_y = struct('index', 44, 'help_string', '');
+            key.receiver_x = struct('index', 60, 'help_string', '');
+            key.receiver_y = struct('index', 61, 'help_string', '');
+            key.shot_x = struct('index', 62, 'help_string', '');
+            key.shot_y = struct('index', 63, 'help_string', '');
+        end
+        
+        function s = help
+            % List of keywords / indices combinations:
+            keys = Header.keywords;
+            ff = fields(keys);
+            for n = 1:length(ff)
+                disp([num2str(keys.(ff{n}).index, '%02.0f') ' ' ff{n} ' ' keys.(ff{n}).help_string])
+            end
+            disp('')
         end
     end
 end
