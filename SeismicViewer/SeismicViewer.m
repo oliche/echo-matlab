@@ -22,7 +22,7 @@ function varargout = SeismicViewer(varargin)
 
 % Edit the above text to modify the response to help SeismicViewer
 
-% Last Modified by GUIDE v2.5 25-Jun-2020 10:05:09
+% Last Modified by GUIDE v2.5 24-Jul-2020 12:09:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -127,8 +127,9 @@ switch mode
         w = get(h.im_seismic, 'cdata');
         hv = get(h.pl_header, 'ydata');
         data = getappdata(h.fig_main, 'data');
-        tr = round(pos(1)); s = round(pos(1, 2));
-        t = data.si .* (s - 1);
+        tr = round(pos(1));
+        t = pos(1, 2); s = round(t / data.si);
+        disp([t h.var.ybounds])
         if t < h.var.ybounds(1) || t > h.var.ybounds(2),
             amp = NaN;
         else
@@ -206,3 +207,8 @@ catch
 end
 set(h.pl_header, 'xdata', 1:data.ntr, 'ydata', hdata)
 set(hobj, 'BackgroundColor', 'w')
+
+
+function ed_gain_Callback(hobj, evt, h)
+h = guidata(hobj);
+sv.gain(h)
