@@ -78,10 +78,10 @@ function fig_key_press(hobj, evt)
 h = guidata(hobj);
 switch true
     % ctr+a : display gain + 3dB
-    case strcmp(evt.Key, 'a') & strcmp('control', evt.Modifier)
+    case strcmp(evt.Key, 'z') & strcmp('control', evt.Modifier)
         sv.gain(h, 3)
     % ctr+z : display gain - 3dB
-    case strcmp(evt.Key, 'z') & strcmp('control', evt.Modifier)
+    case strcmp(evt.Key, 'a') & strcmp('control', evt.Modifier)
         sv.gain(h, -3)
     % ctr+p : propagate display
     case strcmp(evt.Key, 'p') & strcmp('control', evt.Modifier)
@@ -129,7 +129,6 @@ switch mode
         data = getappdata(h.fig_main, 'data');
         tr = round(pos(1));
         t = pos(1, 2); s = round(t / data.si);
-        disp([t h.var.ybounds])
         if t < h.var.ybounds(1) || t > h.var.ybounds(2),
             amp = NaN;
         else
