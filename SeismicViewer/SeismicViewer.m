@@ -187,7 +187,7 @@ if isempty(pl)
 else
     set(pl, 'ydata', w(:, round(pos(1))))
 end
-
+set(get(pl, 'parent'), 'xlim', xylims(3:4))
 
 %% --- Objects Callbacks
 function ed_header_Callback(hobj, evt, h)

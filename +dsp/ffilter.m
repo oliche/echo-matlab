@@ -1,5 +1,8 @@
 classdef ffilter
     % Fourier domain filters
+    % dsp.ffilter.lp(X, 0.002, [20 30], 'padding', 0.5, 'taper', 0.2)
+    % dsp.ffilter.hp(X, 0.002, [2 4], 'padding', 0.5, 'taper', 0.2)
+    % dsp.ffilter.bp(X, 0.002, [2 4 80 100], 'padding', 0.5, 'taper', 0.2)
     
     methods(Static)
         %% low pass filter - 2 frequency values
@@ -16,7 +19,7 @@ classdef ffilter
         
         %% band pass filter - 4 frequency values
         function ts_ = bp(ts, si, b, varargin)
-            % dsp.ffilter.hp(X, 0.002, [2 4 80 100], 'padding', 0.5, 'taper', 0.2)
+            % dsp.ffilter.bp(X, 0.002, [2 4 80 100], 'padding', 0.5, 'taper', 0.2)
             ts_ = generic_filter(ts, si, b, 'bp', varargin{:});
         end
     end
