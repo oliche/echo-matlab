@@ -58,11 +58,13 @@ classdef Header < double
             key.receiver_number = struct('index', 18, 'help_string', '');
             key.inline = struct('index', 19, 'help_string', '');
             key.offset = struct('index', 20, 'help_string', '');
-            key.sensor_type = struct('index', 28, 'help_string', '');
+            key.sensor_type = struct('index', 28, 'help_string', '1: hydrophone, 2/3/4: z,x,y geophones, 6/7/8: z, x,y accelerometers');
             key.receiver_line = struct('index', 36, 'help_string', '');
             key.shot_line = struct('index', 37, 'help_string', '');
             key.cdp_x = struct('index', 43, 'help_string', '');
             key.cdp_y = struct('index', 44, 'help_string', '');
+            key.receiver_z = struct('index', 52, 'help_string', '');
+            key.source_z = struct('index', 53, 'help_string', '');
             key.receiver_x = struct('index', 60, 'help_string', '');
             key.receiver_y = struct('index', 61, 'help_string', '');
             key.shot_x = struct('index', 62, 'help_string', '');
