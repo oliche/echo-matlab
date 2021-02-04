@@ -1,9 +1,8 @@
-classdef test_dsp < matlab.unittest.TestCase    
+classdef test_dsp < matlab.unittest.TestCase
     
     methods(Test)
         function test_dsp_window(self)
-            
-            %% test dsp.window()
+            %test dsp.window()
             % full window
             exp = [0;0.116977778440511;0.413175911166535;0.75;0.969846310392954;0.969846310392954;0.75;0.413175911166535;0.116977778440511;0];
             self.assertTrue(all(abs(dsp.window.cosine(10, false) - exp(:)) < 1e-10))
@@ -16,6 +15,10 @@ classdef test_dsp < matlab.unittest.TestCase
             self.assertTrue(all(abs(dsp.window.cosine(9) - exp(:)) < 1e10))
             % test the extrapolation outside of the bounds
             f = dsp.window.cosinefunc([8 10]);
+            y = f(linspace(0, 50));
+            assert(y(1) == 0), assert(y(end) == 1), assert(max(y) == 1)
+            % test bounds int64
+            f = dsp.window.cosinefunc(int64([8 10]));
             y = f(linspace(0, 50));
             assert(y(1) == 0), assert(y(end) == 1), assert(max(y) == 1)
         end
@@ -36,7 +39,7 @@ classdef test_dsp < matlab.unittest.TestCase
             bp = dsp.ffilter.bp(s, 0.002, [10, 15, 50, 60], 'padding', 1, 'taper', 0.8);
             self.assertTrue(max(max(abs((s - lp2 - hp2) - bp))) < 1e6)
         end
-
+        
         function test_deriv_integ(self)
             % seed the random number generator
             rng(42)
@@ -46,12 +49,12 @@ classdef test_dsp < matlab.unittest.TestCase
             % test derivation
             sd = dsp.deriv(s, 1);
             sd1 = interp1([1:nech-1] - 0.5, diff(s(:, 1)), [1:nech] - 1, 'spline')';
-            self.assertTrue(mean(abs(sd1 - sd(:,1))) < 0.001)            
+            self.assertTrue(mean(abs(sd1 - sd(:,1))) < 0.001)
             % test integration
             s_ = dsp.integ(sd, 0.002, [3 , 0]);
             self.assertTrue(max(abs(s(:, 1) - s_(:,1) ./ 0.002)) < 1e-5)
-            s_ = dsp.integ(sd, 0.002, [3 , 1], 'padding', 1, 'taper', 0.8);            
+            s_ = dsp.integ(sd, 0.002, [3 , 1], 'padding', 1, 'taper', 0.8);
         end
-
+        
     end
 end

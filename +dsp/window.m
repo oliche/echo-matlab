@@ -21,9 +21,10 @@ classdef window
         end
 
         function func = cosinefunc(bounds, half)
-        % func = cosinefunc(bounds, half)
-        % returns a function that applies a sine function for values between bounds
-        % values outside of bounds are extrapolated flat
+            % func = cosinefunc(bounds, half)
+            % returns a function that applies a sine function for values between bounds
+            % values outside of bounds are extrapolated flat
+            bounds = double(bounds);
             if nargin <= 1, half = true; end
             if half, fac = 1; else fac = 2; end
             func = @(x) (1 - cos((x - bounds(1)) ./ (bounds(2) - bounds(1)) .* pi .* fac)) / 2;
