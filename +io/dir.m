@@ -1,4 +1,4 @@
-function file_list = dir(chem, varargin)
+function file_list = dir(chem, search_pattern, varargin)
 % file_list = io.dir(folder_path, 'pattern', filter)
 % file_list = io.dir(folder_path, 'pattern', filter, 'recursive', false)
 % recursive: default is true (not implemented yet)
@@ -8,14 +8,13 @@ function file_list = dir(chem, varargin)
 persistent p; % for recursive calls, avoids setting this up each time
 p = inputParser;
 addRequired(p, 'chem');
-addOptional(p,'pattern', '*.*');
 addParameter(p,'recursive', true)
 parse(p,chem,varargin{:});
 for fn = fieldnames(p.Results)', eval([fn{1} '= p.Results.' (fn{1}) ';']); end
 
 %% dir part
 if chem(end) ~= filesep, chem = [ chem, filesep]; end
-file_list = dir([chem pattern]);
+file_list = dir([chem search_pattern]);
 % removes directories from the list
 file_list = file_list(arrayfun(@(x) ~(x.isdir), file_list));
 file_list = arrayfun(@(x) [x.folder filesep x.name], file_list, 'UniformOutput', false);
