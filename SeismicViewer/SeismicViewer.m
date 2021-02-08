@@ -22,7 +22,7 @@ function varargout = SeismicViewer(varargin)
 
 % Edit the above text to modify the response to help SeismicViewer
 
-% Last Modified by GUIDE v2.5 24-Jul-2020 12:09:15
+% Last Modified by GUIDE v2.5 08-Feb-2021 16:46:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -58,7 +58,7 @@ set(h.fig_main, 'WindowButtonMotionFcn', {@fig_button_motion, ''})
 linkaxes([h.axe_header, h.axe_seismic], 'x')
 % create empty objects and set defaults: objects
 h.im_seismic = imagesc([], 'parent', h.axe_seismic);
-h.pl_header = plot(h.axe_header, NaN, NaN);
+h.pl_header = plot(h.axe_header, NaN, [NaN; NaN; NaN; NaN]);
 h.axe_header.XAxis.Visible = 'off';
 % create context menus
 h.cm = uicontextmenu('parent',h.fig_main);
@@ -134,7 +134,12 @@ switch mode
         else
             amp = w(s, tr);
         end
-        set(h.txt_hover, 'String', sprintf('amp: %4.4f \ntrace: %0.0f \ntime: %0.4f \nheader: %4.4f', [amp, tr, t, hv(tr)]))
+        hval = [];
+        for m = 1:length(hv),
+            if ~isnan(hv{m}), hval = [hval, hv{m}(tr)]; end
+        end
+        hformat = repmat('%4.4f ', 1, length(hval));
+        set(h.txt_hover, 'String', sprintf(['amp: %4.4f \ntrace: %0.0f \ntime: %0.4f \nheader: ' hformat], [amp, tr, t, hval]))
         set(h.txt_hover, 'HorizontalAlignment', 'left')
         % update the plot traces
         pl = findobj('Type', 'line', 'tag', 'plot_view_trace');
@@ -190,24 +195,61 @@ end
 set(get(pl, 'parent'), 'xlim', xylims(3:4))
 
 %% --- Objects Callbacks
+function hdata = get_header_data_from_edit_string(obj, data)
+% possible inputs are a header string such as "offset", a single or several
+% (4 max) header indices. Todo write a quick test when extending this to
+% multiple header strings
+hdata = NaN;
+try
+    str = get(obj, 'String');
+    if ~isempty(str2num(str))
+        hdata = double(data.H(str2num(str), :));  % one or several indices
+    else 
+        hdata = data.H.(lower(str)); % header string
+    end
+    set(obj, 'BackgroundColor', [1 1 1])
+catch
+    set(obj, 'BackgroundColor', [.9 .8 .5])
+    return
+end
+
+function ed_sort_Callback(hobj, evt, h)
+h = guidata(hobj);
+data = getappdata(h.fig_main, 'data');
+hdata = get_header_data_from_edit_string(hobj, data);
+if isnan(hdata), return , end
+[~, ordre] = sortrows(hdata');
+% no need to change anything if the order didn't change
+if all(ordre == [1:data.ntr]'), return, end  
+% sort all the necessary fields
+data.W = data.W(:, ordre);
+data.H = data.H(:, ordre);
+data.order = data.order(ordre);
+data.sel = data.sel(ordre);
+setappdata(h.fig_main, 'data', data)
+% update the gui display
+sv.draw(h.fig_main)
+
+
 function ed_header_Callback(hobj, evt, h)
 h = guidata(hobj);
 data = getappdata(h.fig_main, 'data');
-try
-    str = get(hobj, 'String');
-    if ~isnan(str2double(str))
-        hdata = data.H(str2double(str), :);
+hdata = get_header_data_from_edit_string(hobj, data);
+if isnan(hdata), return , end
+% Make it work for several
+for m = 1:length(h.pl_header)
+    if size(hdata, 1) < m
+        set(h.pl_header(m), 'xdata', NaN, 'ydata', NaN)
     else
-        hdata = data.H.(lower(str));
+        set(h.pl_header(m), 'xdata', 1:data.ntr, 'ydata', hdata(m, :))
     end
-catch
-    set(hobj, 'BackgroundColor', [.9 .8 .5])
-    return
 end
-set(h.pl_header, 'xdata', 1:data.ntr, 'ydata', hdata)
-set(hobj, 'BackgroundColor', 'w')
 
 
 function ed_gain_Callback(hobj, evt, h)
 h = guidata(hobj);
 sv.gain(h)
+
+
+
+

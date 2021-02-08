@@ -32,16 +32,16 @@ h = guidata(figsv);
 si = H(9) / 1e6;
 
 %% set the data structure in the GUI
-setappdata(h.fig_main, 'data', struct('W', W, 'H', Header(H), 'ns', ns, 'ntr', ntr, 'si', si));
+data = struct('W', W, 'H', Header(H), 'ns', ns, 'ntr', ntr, 'si', si, 'order', [1:ntr]', 'sel', ones(ntr, 1, 'logical'));
+
+setappdata(h.fig_main, 'data', data);
 h.var = struct('ybounds', [0 (ns - 1) .* si], 'xbounds', [1 ntr], 'button_hold_point', 0);
 guidata(figsv, h)
 
-%% update the display according to data
-sv.draw(figsv)
-
 % set the offset as a default header value
 set(h.ed_header, 'String', 'offset')
-edcallback = get(h.ed_header, 'Callback');
-edcallback(h.ed_header, [])
+
+%% update the display according to data
+sv.draw(figsv)
 
 end
