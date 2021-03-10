@@ -48,7 +48,7 @@ classdef test_io_dir < matlab.unittest.TestCase
             % for every pattern and list of files, check output against
             % desired output
             for t = 1:length(testCase.results)
-                res = io.dir(testCase.tdir, 'pattern', testCase.results(t).ext);
+                res = io.dir(testCase.tdir, testCase.results(t).ext);
                 testCase.assertEqual(testCase.results(t).files(:), res);
             end
         end

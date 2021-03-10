@@ -1,6 +1,6 @@
-function file_list = dir(chem, search_pattern, varargin)
-% file_list = io.dir(folder_path, 'pattern', filter)
-% file_list = io.dir(folder_path, 'pattern', filter, 'recursive', false)
+function file_list = dir(chem, varargin)
+% file_list = io.dir(folder_path, filter)
+% file_list = io.dir(folder_path, filter, 'recursive', false)
 % recursive: default is true (not implemented yet)
 % returns a cell-array list of full file paths 
 
@@ -8,8 +8,9 @@ function file_list = dir(chem, search_pattern, varargin)
 persistent p; % for recursive calls, avoids setting this up each time
 p = inputParser;
 addRequired(p, 'chem');
+addRequired(p, 'search_pattern');
 addParameter(p,'recursive', true)
-parse(p,chem,varargin{:});
+parse(p, chem, varargin{:});
 for fn = fieldnames(p.Results)', eval([fn{1} '= p.Results.' (fn{1}) ';']); end
 
 %% dir part

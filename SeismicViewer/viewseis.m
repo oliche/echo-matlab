@@ -2,13 +2,11 @@ function figsv = viewseis(W, H, varargin)
 % viewseis(W,H)
 % viewseis(W,H, 'name', 'mytitle')
 
-
 %% parse input arguments
 p=inputParser;
 p.addParameter('name', 'SeismicViewer', @isstr);
 p.parse(varargin{:});
 for ff=fields(p.Results)', eval([ff{1} '=p.Results.' ff{1} ';' ]); end
-
 
 %% multiple figures management: the name of the figure is the key to find a pre-existing window
 registered_figures = getappdata(0, 'viewseis');
