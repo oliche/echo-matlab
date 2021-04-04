@@ -25,5 +25,5 @@ if ~recursive, return, end
 file_list_all = dir([chem]);
 folders = file_list_all(arrayfun(@(x) x.isdir & ~all(x.name=='.'), file_list_all));
 for m = 1:length(folders)
-    file_list = [file_list ; io.dir([folders(m).folder filesep folders(m).name], varargin{:}) ] ;
+    file_list = [file_list ; io.dir([folders(m).folder filesep folders(m).name], varargin{:})];
 end
