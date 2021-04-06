@@ -1,10 +1,10 @@
 
 
-v = [2.2;3.9;4.5; 4.7 ;4.7] *1e3
-t = [.1;.5;  1; 2 ;4]
-dt = .01
+v = [2.2;3.9;4.5; 4.7 ;4.7] *1e3;
+t = [.1;.5;  1; 2 ;4];
+dt = .01;
 Si = .002;
-Lsmooth = 30
+Lsmooth = 30;
 
 ntr = 50;
 ns = 2000;
@@ -18,9 +18,7 @@ H(20, :) = offset;
 
 
 
-
-
-%% Get the angles at the reflectors for all offsets
+%% Get the angles at the cable for all offsets
 cangle = iangle .* 0;
 for n = 1:size(cangle, 1)
     
@@ -37,5 +35,6 @@ for n = 1:size(cangle, 1)
      cangle(n, :) = rt;
 end
 
-ViewData(iangle, H, 'iangle')
-ViewData(cangle, H, 'cangle')
+% ViewData(iangle, H, 'iangle')
+% ViewData(cangle, H, 'cangle')
+assert(true)

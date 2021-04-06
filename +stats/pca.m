@@ -1,6 +1,6 @@
-function Z = pca(X, k)
-% stats.pca(X,k)
-% simple principal component analysis
+function [Z, fcn_forward, fcn_inverse] = pca(X, k)
+% [Z, U_] = stats.pca(X,k)
+% dimensionality reduction using principal component analysis
 % X : feature matrix, X(nsamples, nfeatures)
 % k : if k >= 1 number of features to keep 
 %     if k < 1: threshold on the sum of singular values to retain
@@ -9,7 +9,8 @@ function Z = pca(X, k)
 iok = ~isnan(X) & ~isinf(X);
 X(~iok) = 0;
 % compute the covariance matrix without the NaN's
-Q = bsxfun( @minus, X , sum(X) ./ sum(iok) );
+xmean = sum(X) ./ sum(iok);
+Q = bsxfun( @minus, X , xmean);
 Q(~iok) = 0;
 covX = (Q' * Q)./  ( double(iok') * double(iok) -1);
 % singular value decomposition
@@ -24,4 +25,8 @@ if k < 1 % threshold technique of the diagonal of S (singular values)
 end
 
 U_ = U(:,1:k);
-Z = X * U_;
+
+fcn_inverse = @(z) z * pinv(U_) + xmean;
+fcn_forward = @(x) (x - xmean) * U_;
+
+Z = fcn_forward(X);
