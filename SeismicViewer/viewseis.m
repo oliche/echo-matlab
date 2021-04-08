@@ -8,6 +8,11 @@ p.addParameter('name', 'SeismicViewer', @isstr);
 p.parse(varargin{:});
 for ff=fields(p.Results)', eval([ff{1} '=p.Results.' ff{1} ';' ]); end
 
+%% get data attributes
+[ns, ntr] = size(W(:, :));
+if isscalar(H), H = Header.create(ntr, 'si', H); end
+si = H(9) / 1e6;
+
 %% multiple figures management: the name of the figure is the key to find a pre-existing window
 registered_figures = getappdata(0, 'viewseis');
 % clean up the registered figures variables by checking if they exist
@@ -24,16 +29,11 @@ setappdata(0, 'viewseis', registered_figures)
 set(figsv, 'name', name)
 
 %% get figure handles and start updating data
-[ns, ntr] = size(W(:, :));
-if isscalar(H), H = Header.create(ntr, 'si', H); end
 h = guidata(figsv);
-si = H(9) / 1e6;
-
 %% set the data structure in the GUI
 data = struct('W', W, 'H', Header(H), 'ns', ns, 'ntr', ntr, 'si', si, 'order', [1:ntr]', 'sel', ones(ntr, 1, 'logical'));
 
 setappdata(h.fig_main, 'data', data);
-h.var = struct('ybounds', [0 (ns - 1) .* si], 'xbounds', [1 ntr], 'button_hold_point', 0);
 guidata(figsv, h)
 
 % set the offset as a default header value
