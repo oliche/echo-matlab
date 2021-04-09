@@ -65,7 +65,10 @@ h.cm = uicontextmenu('parent',h.fig_main);
 set(h.axe_seismic,'UIContextMenu',h.cm);
 set(h.axe_header,'UIContextMenu',h.cm);
 h.cms = struct();
-h.cms.view_trace = uimenu(h.cm,'Label','view Trace', 'callback', @cm_view_trace_callback);
+h.cms.view_trace = uimenu(h.cm,'Label','view trace', 'callback', @cm_view_trace_callback);
+h.cms.view_spectrum = uimenu(h.cm,'Label','view trace spectrum', 'callback', @cm_view_spectrum_callback);
+% h.cms.view_spectrogram = uimenu(h.cm,'Label','view trace spectrogram', 'callback', @cm_view_spectrogram_callback);
+
 guidata(hobj, h);
 
 
@@ -135,16 +138,19 @@ switch mode
             amp = w(s, tr);
         end
         hval = [];
-        for m = 1:length(hv),
+        for m = 1:length(hv)
             if ~isnan(hv{m}), hval = [hval, hv{m}(tr)]; end
         end
         hformat = repmat('%4.4f ', 1, length(hval));
         set(h.txt_hover, 'String', sprintf(['amp: %4.4f \ntrace: %0.0f \ntime: %0.4f \nheader: ' hformat], [amp, tr, t, hval]))
-        set(h.txt_hover, 'HorizontalAlignment', 'left')
-        % update the plot traces
-        pl = findobj('Type', 'line', 'tag', 'plot_view_trace');
+        set(h.txt_hover, 'HorizontalAlignment', 'left');
+        % update the plot traces, spectrum and spectrogram
+        pl = findobj('Type', 'line', 'tag', 'plot_trace');
+        if ~isempty(pl), set(pl, 'ydata', w(:, tr)), end
+        pl = findobj('Type', 'line', 'tag', 'plot_spectrum');
         if ~isempty(pl)
-            set(pl, 'ydata', w(:, tr))
+            [~, amp] = dsp.spectrum(w(:, tr), data.si, 'Display', false);
+            set(pl, 'ydata', amp);
         end
 end
 guidata(hobj, h)
@@ -177,6 +183,23 @@ function fig_button_up(hobj, evt)
 set(hobj, 'WindowButtonUpFcn', '', 'WindowButtonMotionFcn', {@fig_button_motion, ''})
 
 %% --- Menu Callbacks
+function cm_view_spectrum_callback(hobj, evt, h)
+h = guidata(hobj);
+data = getappdata(h.fig_main, 'data')
+pos = get(h.axe_seismic, 'CurrentPoint');
+xylims = axis(h.axe_seismic);
+if pos(1) < xylims(1) || pos(1) > xylims(2), return, end
+w = get(h.im_seismic, 'cdata');
+[~, amp, ~, freq] = dsp.spectrum(w(:, round(pos(1))), data.si, 'Display', false);
+pl = findobj('Type', 'line', 'tag', 'plot_spectrum');
+if isempty(pl)
+    f = figure('name', 'trace', 'numbertitle', 'off', 'color', 'w');
+    ax = axes(f, 'tag', 'ax_spectrum');
+    pl = plot(ax, freq,  amp, 'tag', 'plot_spectrum');
+else
+    set(pl, 'ydata', amp)
+end
+
 function cm_view_trace_callback(hobj, evt, h)
 h = guidata(hobj);
 data = getappdata(h.fig_main, 'data');
@@ -184,15 +207,16 @@ pos = get(h.axe_seismic, 'CurrentPoint');
 xylims = axis(h.axe_seismic);
 if pos(1) < xylims(1) || pos(1) > xylims(2), return, end
 w = get(h.im_seismic, 'cdata');
-pl = findobj('Type', 'line', 'tag', 'plot_view_trace');
+pl = findobj('Type', 'line', 'tag', 'plot_trace');
 if isempty(pl)
-    f = figure('name', 'view trace', 'numbertitle', 'off', 'color', 'w');
-    ax = axes(f, 'tag', 'ax_view_trace');
-    pl = plot(ax,[0 : size(w, 1) - 1]' .* data.si,  w(:, round(pos(1))), 'tag', 'plot_view_trace');
+    f = figure('name', 'trace', 'numbertitle', 'off', 'color', 'w');
+    ax = axes(f, 'tag', 'ax_plot_trace');
+    pl = plot(ax,[0 : size(w, 1) - 1]' .* data.si,  w(:, round(pos(1))), 'tag', 'plot_trace');
 else
     set(pl, 'ydata', w(:, round(pos(1))))
 end
 set(get(pl, 'parent'), 'xlim', xylims(3:4))
+
 
 %% --- Objects Callbacks
 function hdata = get_header_data_from_edit_string(obj, data)
