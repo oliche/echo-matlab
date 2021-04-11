@@ -1,9 +1,9 @@
 function ts = padding_tapering(ts, si, padding, taper, forward)
 % apply / remove taper at the start and end of time serie - first dimension
-% to apply tapering + padding:
-% ts = padding_tapering(ts, 1, 0.5, True)
-% to remove padding:
-% ts = padding_tapering(ts, 1, 0.5, True)
+% to apply padding 1 sec + 0.5 sec tapering :
+% ts = padding_tapering(ts, si, 1, 0.5, True)
+% to remove padding/tapering:
+% ts = padding_tapering(ts, si, 1, 0.5, False)
 npad = round(padding / si);
 
 if forward

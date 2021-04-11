@@ -1,6 +1,21 @@
 classdef test_dsp < matlab.unittest.TestCase
     
     methods(Test)
+        function test_dsp_tf(self)
+           %% spectrogram test on a sweep - check that the extracted instantaneous frequency matches
+           ns = 2000;
+           si = 0.002;
+           fbounds = [4, 96];
+           f = linspace(fbounds(1), fbounds(2), ns)';
+           sweep = sin(2 * pi * cumsum(f * si));
+           [tf, tscale, fscale] = dsp.tf(sweep, si);
+           figure, imagesc(fscale, tscale, tf), set(gca, 'clim', max(tf(:)) + [- 80, 0])
+           [vmax, imax] = max(tf, [], 2);
+           assert(all(size(tf) == [length(tscale) length(fscale)]))
+           assert( mean(interp1([0: (ns - 1)] * si, f, tscale)' - fscale(imax)) < 0.05)
+           assert( abs(mean(vmax)  + 9.9035) < 0.01)
+        end
+             
         function test_dsp_window(self)
             %test dsp.window()
             % full window
