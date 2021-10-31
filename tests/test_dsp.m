@@ -2,20 +2,20 @@ classdef test_dsp < matlab.unittest.TestCase
     
     methods(Test)
         function test_dsp_tf(self)
-           %% spectrogram test on a sweep - check that the extracted instantaneous frequency matches
-           ns = 2000;
-           si = 0.002;
-           fbounds = [4, 96];
-           f = linspace(fbounds(1), fbounds(2), ns)';
-           sweep = sin(2 * pi * cumsum(f * si));
-           [tf, tscale, fscale] = dsp.tf(sweep, si);
-           figure, imagesc(fscale, tscale, tf), set(gca, 'clim', max(tf(:)) + [- 80, 0])
-           [vmax, imax] = max(tf, [], 2);
-           assert(all(size(tf) == [length(tscale) length(fscale)]))
-           assert( mean(interp1([0: (ns - 1)] * si, f, tscale)' - fscale(imax)) < 0.05)
-           assert( abs(mean(vmax)  + 9.9035) < 0.01)
+            %% spectrogram test on a sweep - check that the extracted instantaneous frequency matches
+            ns = 2000;
+            si = 0.002;
+            fbounds = [4, 96];
+            f = linspace(fbounds(1), fbounds(2), ns)';
+            sweep = sin(2 * pi * cumsum(f * si));
+            [tf, tscale, fscale] = dsp.tf(sweep, si);
+            figure, imagesc(fscale, tscale, tf), set(gca, 'clim', max(tf(:)) + [- 80, 0])
+            [vmax, imax] = max(tf, [], 2);
+            assert(all(size(tf) == [length(tscale) length(fscale)]))
+            assert( mean(interp1([0: (ns - 1)] * si, f, tscale)' - fscale(imax)) < 0.05)
+            assert( abs(mean(vmax)  + 9.9035) < 0.01)
         end
-             
+        
         function test_dsp_window(self)
             %test dsp.window()
             % full window
@@ -71,5 +71,12 @@ classdef test_dsp < matlab.unittest.TestCase
             s_ = dsp.integ(sd, 0.002, [3 , 1], 'padding', 1, 'taper', 0.8);
         end
         
+        function test_fshift(self)
+            % seed the random number generator
+            rng(482)
+            nech = 2000;
+            s = rand(nech, 5, 'double');
+            self.assertTrue(all(all(abs(dsp.fshift(s, 1) - circshift(s, 1)) < 1e-12)))
+        end
     end
 end
