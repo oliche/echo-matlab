@@ -1,4 +1,5 @@
-function [MaxiTps,MaxiVal]=sig_Pick(X)
+function [MaxiTps,MaxiVal] = sig_Pick(X)
+%  [MaxiTps,MaxiVal] = sig_Pick(X)
 
 %X=[1 2 -1 1 3 .9 1;1 2 -1 1 3 1 1;0 1 2 -1 1 3 .8 ;4 4 1 1 3 .8 1;4 2 1 1 3 .8 1;;4 2 1 1 3 .8 6;;4 2 1 1 3 7 7]';
 [~,ind]=max(X);
