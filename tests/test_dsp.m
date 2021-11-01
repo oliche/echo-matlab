@@ -76,7 +76,10 @@ classdef test_dsp < matlab.unittest.TestCase
             rng(482)
             nech = 2000;
             s = rand(nech, 5, 'double');
-            self.assertTrue(all(all(abs(dsp.fshift(s, 1) - circshift(s, 1)) < 1e-12)))
+            ss = dsp.fshift(s, [1, 2, 3, 4, 5]);
+            for m  = 1:5
+                self.assertTrue(all(all(abs(ss(:, m) - circshift(s(:, m), m)) < 1e-12)))
+            end
         end
     end
 end

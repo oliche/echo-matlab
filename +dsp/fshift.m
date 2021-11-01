@@ -13,7 +13,7 @@ dephas(2) = 1;
 dephas = dsp.freduce(fft(dephas));
 
 % applies the phase shift and go back to time domain
-w = real(ifft(dsp.fexpand(dsp.freduce(fft(w(:, :))) .* exp(i * angle(dephas)), ns)));
+w = real(ifft(dsp.fexpand(dsp.freduce(fft(w(:, :))) .* (exp(i * angle(dephas) * shift)), ns)));
 w = reshape(w, size_w);
 
 end
