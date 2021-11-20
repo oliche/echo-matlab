@@ -8,7 +8,7 @@ classdef SeismicReaderInterface < handle
     
     properties
         fid  % file identifier object
-        file_segd  % full-file path
+        file  % full-file path
         fh  % file header structure
         fhbin  % binary file header
         fhsize  % binary file header size in bytes
@@ -73,7 +73,7 @@ classdef SeismicReaderInterface < handle
             % [check, computed_size] = self.checksize(self)
             % check that the filesize matches the header and data sizes
             % returns true when it matches, false
-            finfo = dir(self.file_segd);
+            finfo = dir(self.file);
             expected_size = self.ntr * (self.ns * self.SAMPLE_SIZE + self.thsize) + self.fhsize;
             file_size = finfo.bytes; 
             check = file_size == expected_size;
