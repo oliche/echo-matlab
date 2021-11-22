@@ -2,9 +2,6 @@ classdef SeismicReaderInterface < handle
     % Interface to define seismic readers
     % Based on the common structure: FileHeader, (Trace Header - Trace Data) * Ntraces
     
-    properties (Constant)
-       SAMPLE_SIZE = 4 
-    end
     
     properties
         fid  % file identifier object
@@ -18,6 +15,9 @@ classdef SeismicReaderInterface < handle
         rl  % record length (s)
         si  % sampling interval (s)
         thsize  % single binary trace header size in bytes
+        sample_size = 4 
+        sample_format = 'single';  % ieee single "single" or "ibm"
+        endianess = 'big'; 
     end
     
     methods (Abstract)
@@ -36,7 +36,7 @@ classdef SeismicReaderInterface < handle
         function offset = trace_offset(self, trace_index)
             % self.trace_offset(trace_index)
             % computes the offset in bytes for a given trace index
-           offset = (trace_index - 1) * (self.ns * self.SAMPLE_SIZE + self.thsize) + self.fhsize; 
+           offset = (trace_index - 1) * (self.ns * self.sample_size + self.thsize) + self.fhsize; 
         end
         
         function [data, th, thbin] = read(self, varargin)
@@ -53,17 +53,22 @@ classdef SeismicReaderInterface < handle
             % read the traces
             fseek(self.fid, self.trace_offset(first), 'bof');
             ntr_ = last - first + 1;
-            data = fread(self.fid, [self.ns * self.SAMPLE_SIZE + self.thsize, ntr_], '*uint8');
+            data = fread(self.fid, [self.ns * self.sample_size + self.thsize, ntr_], '*uint8');
             thbin = data(1:self.thsize, :);
-            data = data(self.thsize + [1:self.ns * self.SAMPLE_SIZE], :);
-            data = reshape(typecast(data(:), 'single'), [self.ns, ntr_]);
-            if self.fh.format_code == 8058,
-                data = swapbytes(data); % could use a speed up in mex if necessary, but all new data is segd v3 
-                % and little endian so left it fo now
-            else
-                assert(self.fh.format_code == 9058)  % reads IEEE float little endian
-            end
+            data = data(self.thsize + [1:self.ns * self.sample_size], :);
             
+            switch self.sample_format
+                case 'single'
+                    data = reshape(typecast(data(:), 'single'), [self.ns, ntr_]);
+                    if strcmp(self.endianess, 'big'); data = swapbytes(data); end
+                case 'int32'
+                    data = reshape(typecast(data(:), 'int32'), [self.ns, ntr_]);
+                    if strcmp(self.endianess, 'big'); data = swapbytes(data); end
+                case 'ibm'
+                    data = reshape(typecast(data(:), 'single'), [self.ns, ntr_]);
+                    if strcmp(self.endianess, 'big'); data = swapbytes(data); end
+                    io.ibm2ieeeFloat(data); % in-place mex file
+            end
             % interpret the trace header
             [th] = self.interpret_thbin(thbin);
         end
@@ -74,7 +79,7 @@ classdef SeismicReaderInterface < handle
             % check that the filesize matches the header and data sizes
             % returns true when it matches, false
             finfo = dir(self.file);
-            expected_size = self.ntr * (self.ns * self.SAMPLE_SIZE + self.thsize) + self.fhsize;
+            expected_size = self.ntr * (self.ns * self.sample_size + self.thsize) + self.fhsize;
             file_size = finfo.bytes; 
             check = file_size == expected_size;
         end

@@ -131,7 +131,7 @@ switch mode
         hv = get(h.pl_header, 'ydata');
         data = getappdata(h.fig_main, 'data');
         tr = round(pos(1));
-        t = pos(1, 2); s = round(t / data.si);
+        t = pos(1, 2); s = max(1, round(t / data.si));
         if t < h.var.ybounds(1) || t > h.var.ybounds(2),
             amp = NaN;
         else
