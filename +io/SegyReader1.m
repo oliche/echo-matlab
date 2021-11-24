@@ -71,13 +71,13 @@ classdef SegyReader1 < io.SeismicReaderInterface
                 th.(F(m).field) = swapbytes(th.(F(m).field));
             end
             % Apply the coordinate scalar
-            isca = ~entre(th.coordinate_scalar, [-1 1]);
+            isca = ~(th.coordinate_scalar >= -1 & th.coordinate_scalar <= 1);
             for field= {'cdp_x', 'cdp_y', 'receiver_x', 'receiver_y', 'offset_x', 'offset_y', 'source_x', 'source_y'}
                 if ~isfield(th, field{1}), continue, end
                 th.(field{1})(isca) = double(th.(field{1})(isca)) ./ double(abs(th.coordinate_scalar(isca)));
             end
             % Apply the elevation scalar
-            isca = ~entre( th.elevation_scalar,[-1 1]);
+            isca = ~(th.elevation_scalar >= -1 & th.elevation_scalar <= 1);
             for field= {'cdp_z', 'receiver_z', 'source_z'}
                 if ~isfield(th, field{1}), continue, end
                 th.(field{1})(isca) = double(th.(field{1})(isca)) ./ double(abs(th.elevation_scalar(isca)));
