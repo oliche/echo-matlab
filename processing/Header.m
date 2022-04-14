@@ -39,7 +39,7 @@ classdef Header < double
         function header = create(ntr, varargin)
             % header = create(ntr, 'si', 0.002, 'offset', offset_vector)
             p=inputParser;
-            fcn_validate = @(x) isscalar(x) || prod(size(x)) == prod(ntr);
+            fcn_validate = @(x) isscalar(x) || numel(x) == prod(ntr);
             p.addParameter('si', 0.002, fcn_validate);
             p.addParameter('offset', 0, fcn_validate);
             p.parse(varargin{:}) ; field = fieldnames(p.Results) ;
