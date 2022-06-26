@@ -18,7 +18,7 @@ x = [[1:9]', [1:9]'*1.5 + 7];
 [z, fcn_forward, fcn_reverse] = stats.pca(x, 1);
 assert(all(all(abs(fcn_reverse(z) - x) < ( 100 * eps))))
 end
-
+    
 
 function test_rcorr_pairwise(self)
 rng(42)

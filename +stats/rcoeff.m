@@ -7,7 +7,7 @@ function r = rcoeff(x, y)
 %     :param y: np array [nc, ns] or [ns]
 %     :return: r [nc]
 
-    xnorm = x - mean(x);
-    ynorm = y - mean(y);
-    r = sum(xnorm .* ynorm) ./ sqrt(sum(xnorm .^2) .* sum(ynorm .^ 2));
+    xnorm = x - nanmean(x);
+    ynorm = y - nanmean(y);
+    r = nansum(xnorm .* ynorm) ./ sqrt(nansum(xnorm .^2) .* nansum(ynorm .^ 2));
 end
