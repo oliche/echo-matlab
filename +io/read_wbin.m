@@ -1,14 +1,19 @@
-function [w, h] = read_wbin(wbin_file, ntr, si, varargin)
+function [w, h] = read_wbin(wbin_file, options)
 % [w, h] = read_wbin(wbin_file)
 % if the file doesn't have header, specify ntr / si, other additional
 % arguments are inputs to Header.create
-% [w, h] = read_wbin(wbin_file, ntr, si, [...])
+% [w, h] = read_wbin(wbin_file, 'ntr', ntr, 'si', si)
 % wbin is a flat binary format containing samples in float 32 in a *.wbin file
 % and a CST header with 64 words in a *.hbin file with matching name
 % for example the pair of files:
 % awesome_stack.wbin
 % awesome_stack.hbin
-
+arguments
+   wbin_file
+   options.ntr = []
+   options.si = .002
+   options.memmap = false
+end
 [chem, fname, ~] = fileparts(wbin_file);
 hbin_file = [chem filesep fname '.hbin'];
 
@@ -18,11 +23,17 @@ if exist(hbin_file, 'file')
     fid = fopen(hbin_file); h = fread(fid, Inf, 'double'); fclose(fid);
     h = reshape(h, [64, ntr]);
 else
+    ntr = options.ntr;
     assert(nargin >= 1)
-    if nargin <= 2, si = .002; end
-    h = Header.create(ntr, 'si', si, varargin{:});
+    h = Header.create(ntr, 'si', options.si);
 end
 
-
-fid = fopen(wbin_file); w = fread(fid, Inf, 'single'); fclose(fid);
-w = reshape(w, [numel(w) / ntr, ntr]);
+a = dir(wbin_file);
+ns = a.bytes / ntr / 4;
+assert(mod(ns, 1) == 0)
+if options.memmap
+    w =  memmapfile(wbin_file,'Format', {'single', [ns, ntr], 'w'}, 'Writable', false);
+else
+    fid = fopen(wbin_file); w = fread(fid, Inf, '*single'); fclose(fid);
+    w = reshape(w, [ns, ntr]);
+end

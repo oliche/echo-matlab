@@ -54,7 +54,7 @@ classdef Header < double
             % default keywords
             key.shot_number = struct('index', 2, 'help_string', '');
             key.crossline = struct('index', 4, 'help_string', '');
-            key.si_us = struct('index', 9, 'help_string', '');
+            key.si_us = struct('index', 9, 'help_string', 'Sampling rate in microseconds');
             key.receiver_number = struct('index', 18, 'help_string', '');
             key.inline = struct('index', 19, 'help_string', '');
             key.offset = struct('index', 20, 'help_string', '');
