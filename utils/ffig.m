@@ -1,4 +1,4 @@
-function fig = ffig(inputArg1,inputArg2)
+function fig = ffig
 % returns a larger figure with white backgroung and a shortcut to copy
 % to clipboard with ctr + shift + c
 
@@ -17,6 +17,7 @@ if strcmp(evt.Key,  'c') && ~isempty(evt.Modifier)
     if all(cellfun(@(x) strcmp(x, 'shift') | strcmp(x, 'control'), evt.Modifier))
         print(fig, '-clipboard', '-dbitmap')
     end
+    disp('figure copied')
 end
 end
 
