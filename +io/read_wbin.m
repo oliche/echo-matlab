@@ -1,13 +1,16 @@
 function [w, h] = read_wbin(wbin_file, options)
 % [w, h] = read_wbin(wbin_file)
-% if the file doesn't have header, specify ntr / si, other additional
-% arguments are inputs to Header.create
-% [w, h] = read_wbin(wbin_file, 'ntr', ntr, 'si', si)
 % wbin is a flat binary format containing samples in float 32 in a *.wbin file
 % and a CST header with 64 words in a *.hbin file with matching name
-% for example the pair of files:
-% awesome_stack.wbin
-% awesome_stack.hbin
+% for example the pair of files: stack.wbin, stack.hbin
+% -
+% -
+% Usages:
+% [w, h] = read_wbin(..., 'memmap', true)
+% -
+% [w, h] = read_wbin(wbin_file, 'ntr', ntr, 'si', si)
+% if the file doesn't have header, specify ntr / si, other additional
+% arguments are inputs to Header.create
 arguments
    wbin_file
    options.ntr = []
