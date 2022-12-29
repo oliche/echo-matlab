@@ -5,15 +5,13 @@ function [w] = fshift(w, shift)
 % shift: shift in samples, can be a non-integer value
 
 size_w = size(w);
-[ns, nc] = size(w(:, :));
-
 % dephas embodies a 1 sample shift transform
-dephas = zeros(ns, 1);
+dephas = zeros(size_w(1), 1);
 dephas(2) = 1;
 dephas = dsp.freduce(fft(dephas));
 
 % applies the phase shift and go back to time domain
-w = real(ifft(dsp.fexpand(dsp.freduce(fft(w(:, :))) .* (exp(i * angle(dephas) * shift)), ns)));
+w = real(ifft(dsp.fexpand(dsp.freduce(fft(w(:, :))) .* (exp(1i * angle(dephas) * shift)), size_w(1))));
 w = reshape(w, size_w);
 
 end
