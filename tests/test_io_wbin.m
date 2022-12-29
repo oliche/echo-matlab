@@ -4,6 +4,7 @@ classdef test_io_wbin < matlab.unittest.TestCase
         tdir
         wbin_file
         hbin_file
+        hpqt_file
         ntr = 500
         ns = 2000
         data
@@ -17,6 +18,7 @@ classdef test_io_wbin < matlab.unittest.TestCase
             testCase.tdir = [tempdir 'iotest' filesep];
             testCase.wbin_file = [testCase.tdir , filesep, 'toto.wbin'];
             testCase.hbin_file= [testCase.tdir , filesep, 'toto.hbin'];
+            testCase.hpqt_file= [testCase.tdir , filesep, 'toto.hpqt'];
             mkdir(testCase.tdir)
             % write the w file
             testCase.data = single(randn(testCase.ns, testCase.ntr));
@@ -33,6 +35,14 @@ classdef test_io_wbin < matlab.unittest.TestCase
     
     
     methods(Test)
+        function test_read_with_compressed_header(testCase)
+            % the main use of this function: read file and separate file header
+            io.write_wbin(testCase.wbin_file, testCase.data, testCase.h, 'parquet', true)
+            [w, h] = io.read_wbin(testCase.wbin_file);
+            assert(all(all(w == testCase.data)))
+            assert(all(all(h == testCase.h)))
+        end
+        
         function test_read_with_header(testCase)
             % the main use of this function: read file and separate file header
             io.write_wbin(testCase.wbin_file, testCase.data, testCase.h)

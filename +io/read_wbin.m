@@ -12,23 +12,28 @@ function [w, h] = read_wbin(wbin_file, options)
 % if the file doesn't have header, specify ntr / si, other additional
 % arguments are inputs to Header.create
 arguments
-   wbin_file
-   options.ntr = []
-   options.si = .002
-   options.memmap = false
+    wbin_file
+    options.ntr = []
+    options.si = .002
+    options.memmap = false
 end
 [chem, fname, ~] = fileparts(wbin_file);
 hbin_file = [chem filesep fname '.hbin'];
+hpqt_file = [chem filesep fname '.hpqt'];
 
-if exist(hbin_file, 'file')
-    a = dir(hbin_file);
-    ntr = a.bytes / 8 / 64; 
-    fid = fopen(hbin_file); h = fread(fid, Inf, 'double'); fclose(fid);
-    h = reshape(h, [64, ntr]);
-else
-    ntr = options.ntr;
-    assert(nargin >= 1)
-    h = Header.create(ntr, 'si', options.si);
+switch true
+    case exist(hbin_file, 'file') == 2
+        a = dir(hbin_file);
+        ntr = a.bytes / 8 / 64;
+        fid = fopen(hbin_file); h = fread(fid, Inf, 'double'); fclose(fid);
+        h = reshape(h, [64, ntr]);
+    case exist(hpqt_file, 'file') == 2
+        h = Header.read_parquet_header(hpqt_file);
+        ntr = size(h, 2);
+    otherwise
+        ntr = options.ntr;
+        assert(nargin >= 1)
+        h = Header.create(ntr, 'si', options.si);
 end
 
 a = dir(wbin_file);

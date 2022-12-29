@@ -33,6 +33,14 @@ classdef Header < double
             if isempty(ind), return, end
             obj(keys.(ff{ind}).index, :) = value;
         end
+        
+        function write_parquet_header(obj, file_parquet)
+            % obj.write_parquet(file_parquet) 
+            % writes non-zeros rows to parquet with a generic header
+            ih = find(all(obj' ~= 0));
+            t = array2table(double(obj(ih, :)).', 'VariableNames', arrayfun(@(x) num2str(x, 'h%02.0f'), ih, 'UniformOutput', false));
+            parquetwrite(file_parquet, t)
+        end
     end
     
     methods (Static)
@@ -79,6 +87,17 @@ classdef Header < double
                 disp([num2str(keys.(ff{n}).index, '%02.0f') ' ' ff{n} ' ' keys.(ff{n}).help_string])
             end
             disp('')
+        end
+        
+        function h = read_parquet_header(parquet_file)
+            % Header.read_parquet_header(parquet_file)
+            % reads in a parquet table as header. Each parquet name has a hXX format, where XX is the header row
+            % empty header row are not represented. See Header.write_parquet_header method
+            t = parquetread(parquet_file);
+            ntr = size(t, 1);
+            h = Header(zeros(64, ntr));
+            ih = cellfun(@(x) str2num(x(2:end)), t.Properties.VariableNames);
+            h(ih, :) = table2array(t).';            
         end
     end
 end
