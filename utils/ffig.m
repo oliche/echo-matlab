@@ -1,10 +1,11 @@
-function fig = ffig
+function fig = ffig(varargin)
 % returns a larger figure with white backgroung and a shortcut to copy
 % to clipboard with ctr + shift + c
-
-
-fig = figure('position', [200 200 900 600], 'color', 'w')
-
+if nargin == 0
+    fig = figure('position', [200 200 900 600], 'color', 'w');
+else
+    fig = figure(varargin{:});
+end
 set(fig, 'WindowKeyPressFcn', @key_press)
 
 end
